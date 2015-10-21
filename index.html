@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<meta name='keywords' content='WebRTC, HTML5, JavaScript' />
+<meta name='description' content='WebRTC Chat' />
+<meta name='viewport' content='width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1'>
+
+<base target='_blank'>
+
+<title>WebRTC Chat</title>
+
+<!-- <link rel='stylesheet' href='css/main.css' /> -->
+<style type="text/css">
+
+#message{
+	resize:none;
+}
+
+#messages {
+    border-radius: 25px;
+    border: 2px solid #8AC007;
+    padding: 20px; 
+    width: 200px;
+    height: 150px;
+    margin-left: 300px;
+    margin-bottom: 50px;
+    overflow-y: scroll;
+    word-wrap: break-word;    
+}
+
+
+</style>
+
+</head>
+
+<body>
+
+<div id='container'>
+
+  <div id='videos'>
+    <video id='localVideo' autoplay muted></video>
+    <video id='remoteVideo' autoplay></video>
+  </div>
+</div>
+<form name="myForm">
+<textarea id="message"></textarea>
+</form>
+<button id="button" value="send" onkeypress="call(event);" >Send</button>
+
+<div id="messages"></div>
+
+<script src='/socket.io/socket.io.js'></script>
+<script src='js/lib/adapter.js'></script>
+<script src='js/main.js'></script>
+
+</body>
+</html>

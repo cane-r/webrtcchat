@@ -1,0 +1,37 @@
+{
+  "name": "OpenShift-Sample-App",
+  "version": "1.0.0",
+  "description": "Webrtc chat roulette try",
+  "keywords": [
+    "OpenShift",
+    "Node.js",
+    "webrtc",
+    "socket.io"
+  ],
+  "author": {
+    "name": "HorsWithNoname",
+    "email": "-",
+    "url": "-"
+  },
+  "homepage": "-",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/cane-r/webrtcchat"
+  },
+
+  "engines": {
+    "node": ">= 0.6.0",
+    "npm": ">= 1.0.0"
+  },
+
+  "dependencies": {
+  "socket.io": "0.9.17",
+  "node-static":"0.7.7"
+   },
+
+  "devDependencies": {},
+  "bundleDependencies": [],
+
+  "private": true,
+  "main": "server.js"
+}
