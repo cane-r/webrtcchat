@@ -1,2 +1,2 @@
-Webrtc Chatroulette like attempt 
-Openshift Ready
+Webrtc Chatroulette
+Redhat Openshift Ready
