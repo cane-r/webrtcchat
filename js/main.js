@@ -23,7 +23,7 @@ if(evt==13){
 
 var isChannelReady;
 var remoteStream;
-var turnReady;
+var isTurnReady;
 
 var localStream;
 var pc;
@@ -31,6 +31,7 @@ var pc;
 var isChrome = !!navigator.webkitGetUserMedia;
 var isInitiator=false;
 var isStarted;
+
 var STUN = {
     url: isChrome 
        ? 'stun:stun.l.google.com:19302' 
@@ -186,13 +187,13 @@ socket.on('full', function (room){
 });
 
 socket.on('join', function (room){
-  console.log('Another peer made a request to join room ' + room);
+  console.log('A join request ..' + room);
   //console.log('This peer is the initiator of room ' + room + '!');
   isChannelReady = true;
 });
 
 socket.on('joined', function (room){
-  console.log('This peer has joined room ' + room);
+  console.log('Joined room ' + room);
   isChannelReady = true;
 });
 
@@ -332,30 +333,6 @@ function createPeerConnection() {
   */
 }
 
-function gotReceiveChannel(event) {
-  trace('Receive Channel Callback');
-  sendChannel = event.channel;
-  sendChannel.onmessage = handleMessage;
-  sendChannel.onopen = handleReceiveChannelStateChange;
-  sendChannel.onclose = handleReceiveChannelStateChange;
-}
-
-function handleMessage(event) {
-  trace('Received message: ' + event.data);
-  receiveTextarea.value = event.data;
-}
-
-function handleSendChannelStateChange() {
-  var readyState = sendChannel.readyState;
-  trace('Send channel state is: ' + readyState);
-  enableMessageInterface(readyState == "open");
-}
-
-function handleReceiveChannelStateChange() {
-  var readyState = sendChannel.readyState;
-  trace('Receive channel state is: ' + readyState);
-  enableMessageInterface(readyState == "open");
-}
 
 
 function handleIceCandidate(event) {
@@ -418,7 +395,7 @@ function requestTurn(turn_url) {
   for (var i in pc_config.iceServers) {
     if (pc_config.iceServers[i].url.substr(0, 5) === 'turn:') {
       turnExists = true;
-      turnReady = true;
+      isTurnReady = true;
       break;
     }
   }
@@ -439,7 +416,7 @@ function requestTurn(turn_url) {
           'url': 'turn:' + 1445279669:UProxy + '@' + 23.251.129.26:3478?transport=udp,
           'credential': kTuBVAATLbe3r0eqeoJgBs6dgHQ=
         });
-            turnReady=true
+            isTurnReady=true
 */
     var xhr = new XMLHttpRequest();
     xhr.onreadystatechange = function(){
@@ -453,7 +430,7 @@ function requestTurn(turn_url) {
           
 
 
-        turnReady = true;
+        isTurnReady = true;
       }
     };
     console.log("Assuming get request..");

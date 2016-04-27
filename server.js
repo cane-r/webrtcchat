@@ -25,8 +25,6 @@ http.get("*",function(req,res){
 app.listen(port,ip);
 
 
-//listen(port,ip);
-//listen(2013,"127.0.0.1");
 
 
 var rooms=populate();
@@ -73,7 +71,7 @@ clients[socket.id]=socket;
         //here another parameter is needed,ie room..
         //io.sockets.in(room).emit('message',message);
         socket.broadcast.to(room).emit('message',message);
-        clients[socket]
+        
     });
 
 
