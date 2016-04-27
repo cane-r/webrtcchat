@@ -131,8 +131,7 @@ var sdpConstraints = {'mandatory': {
 
 /////////////////////////////////////////////
 
-//var socket = io.connect("https://127.0.0.1:2013",{secure: true});
-//var socket = io.connect("http://127.0.0.1:2013");
+//var socket = io.connect("http://127.0.0.1:8443");
 
 //var socket = io.connect("https://webrtcchat-redhatappv2.rhcloud.com:8443 ",{secure: true});
 var socket = io.connect("https://webrtcchat-redhatappv2.rhcloud.com:8443");
@@ -246,7 +245,7 @@ socket.on('message', function (message){
 var localVideo = document.querySelector('#localVideo');
 var remoteVideo = document.querySelector('#remoteVideo');
 
-//burada bi bokluk var..
+//sometimes buggy..
 function handleUserMedia(stream) {
   localStream = stream;
   attachMediaStream(localVideo, stream);
