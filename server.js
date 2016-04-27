@@ -1,29 +1,36 @@
-var port = process.env.OPENSHIFT_NODEJS_PORT || 8080
-var ip = process.env.OPENSHIFT_NODEJS_IP || "127.0.0.1"
+var port = process.env.OPENSHIFT_NODEJS_PORT || 8443 || 8080;
+//var port=8443 ;
+var ip = process.env.OPENSHIFT_NODEJS_IP || "127.0.0.1";
 var static = require('node-static');
+//var http = require('https');
 var http = require('http');
 var file = new(static.Server)();
 var app = http.createServer(function (req, res) {
-    //res.setHeader('Access-Control-Allow-Origin', '85.96.198.184');
-    //res.setHeader('Access-Control-Allow-Methods', 'GET');
-    //res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET');
+    res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
     file.serve(req, res);
-}).listen(port,ip);
+
+});
+/*
+http.get("*",function(req,res){  
+    if(req.url.indexOf("https")===-1){
+//!(req.secure) || 
+        res.redirect("https://webrtcchat-redhatappv2.rhcloud.com");
+    }
+  
+});
+*/
+
+app.listen(port,ip);
+
+
 //listen(port,ip);
 //listen(2013,"127.0.0.1");
 
 
-// var express = require('express');
-// var app = express();
-// console.log(express.static(__dirname + '/js'));
-// app.use(express.static(__dirname + '/js'));
-// app.all('*', function(req, res){
-//  res.sendfile("index.html");
-// });
-
-// app.listen(9000);
-
 var rooms=populate();
+var clients=[];
 
 function populate(){
     var i=0;
@@ -44,8 +51,8 @@ function printRooms(){
 var io = require('socket.io').listen(app);
 io.sockets.on('connection', function (socket){
 
-//printRooms();
-
+console.log("Socket id : " + socket.id);
+clients[socket.id]=socket;
     socket.on("search", function (data) {
         console.log('On search event..');
         for(var i=0;i<rooms.length;i++){
@@ -53,12 +60,11 @@ io.sockets.on('connection', function (socket){
             var size = io.sockets.clients(room).length;
             console.log("On search event..Room " + room + " has " + size + " clients" );
                    if(size<2){
-                    socket.emit("found",room);
                     break;
-                    
-                   
-               }
+                    } 
         }
+        socket.emit("found",room);
+        //setTimeout(function(){ socket.emit("found",room);},200);
 
     });
 
@@ -67,20 +73,16 @@ io.sockets.on('connection', function (socket){
         //here another parameter is needed,ie room..
         //io.sockets.in(room).emit('message',message);
         socket.broadcast.to(room).emit('message',message);
-    });
-
-    socket.on('sendM', function (message,room) {
-        
-        if(/\S/.test(message)){
-           console.log("Sending text message..");
-        socket.broadcast.to(room).emit("mesreceived",message);
-    }
+        clients[socket]
     });
 
 
-    socket.on('init', function (room) {
+
+
+    socket.on('init', function (dd,room) {
         console.log("Init called..");
-            socket.broadcast.to(room).emit("change", true);
+            socket.broadcast.to(room).emit("change", dd);
+            //socket.emit("change", true);
         
     });
 
@@ -96,14 +98,24 @@ io.sockets.on('connection', function (socket){
         var numClients = io.sockets.clients(room).length;
 
         console.log('Room ' + room + ' has ' + numClients + ' client(s)');
-        console.log('Request to create or join room', room);
+       
 
         if (numClients == 0){
             socket.join(room);
+            console.log('Created  room ' + room);
+            console.log("Room " + room + " has " + numClients + " clients" );
             socket.emit('created', room);
+            numClients = io.sockets.clients(room).length;
+            console.log("Room " + room + " has " + numClients + " clients" );
         } else if (numClients == 1) {
-            io.sockets.in(room).emit('join', room);
+            //io.sockets.in(room).emit('join', room);
+            //setTimeout(function(){socket.broadcast.to(room).emit('join',room);},1000);
             socket.join(room);
+            socket.broadcast.to(room).emit('join',room);
+            
+            console.log('Joined room ' + room);
+            numClients = io.sockets.clients(room).length;
+            console.log("Room " + room + " has " + numClients + " clients" );
             socket.emit('joined', room);
         } else { // max two clients
             socket.emit('full', room);

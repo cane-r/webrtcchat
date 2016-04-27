@@ -1,14 +1,7 @@
 'use strict';
 
 var sendChannel;
-var sendButton = document.getElementById("sendButton");
-var sendTextarea = document.getElementById("dataChannelSend");
-var receiveTextarea = document.getElementById("dataChannelReceive");
-var m= document.getElementById("message");
-var me= document.getElementById("messages");
-var b= document.getElementById("button");
-
-
+/*
 
 m.onkeypress=call;
 m.onKeypress=call;
@@ -20,36 +13,60 @@ function call(e)
  var evt=e.keyCode || e.keycode || e.which;
 if(evt==13){
   sendM();
+  //b.click();
 }
 
 }
 
-
-function pos(e, pos) {
-    var range;
-
-    if (e.createTextRange) {
-        range = e.createTextRange();
-        range.move('character', pos);
-        range.select();
-    } else {
-        e.focus();
-        if (e.selectionStart !== undefined) {
-            e.setSelectionRange(ps, pos);
-        }
-    }
-}
-
+*/
 
 
 var isChannelReady;
-var isInitiator=false;
-var isStarted;
-var localStream;
-var pc;
 var remoteStream;
 var turnReady;
 
+var localStream;
+var pc;
+
+var isChrome = !!navigator.webkitGetUserMedia;
+var isInitiator=false;
+var isStarted;
+var STUN = {
+    url: isChrome 
+       ? 'stun:stun.l.google.com:19302' 
+       : 'stun:23.21.150.121'
+};
+
+var TURN = {
+    url: 'turn:turn.bistri.com:80',
+    credential: 'homeo',
+    username:'homeo'
+
+};
+
+
+var TURN2 = {
+    url: 'turn:numb.viagenie.ca',
+    credential: 'caner19888891',
+    username:'canersir@gmail.com'
+
+};
+
+
+var TURN3 = {
+    url: 'turn:turn.anyfirewall.com:443?transport=tcp',
+    credential: 'webrtc',
+    username:'webrtc'
+
+};
+
+
+var pc_config = {
+   iceServers: [STUN, TURN,TURN2,TURN3]
+};
+
+
+/*
   var pc_config = 
   {'iceServers':
   
@@ -60,6 +77,7 @@ var turnReady;
   ]
 
   }; 
+  */
   
 /*
   {'url':'turn:canersir@gmail.com@numb.viagenie.ca,credential:caner19888891'},
@@ -77,7 +95,24 @@ var turnReady;
   {'url':'turn:homeo@turn.bistri.com:80,credential:homeo'},
   {'url':'turn:webrtc@live.com@numb.viagenie.ca,credential:muazkh'},
   {'url':'turn:louis@mozilla.com@numb.viagenie.ca,credential:webrtcdemo'},
-  {'url':'turn:webrtc@turn.anyfirewall.com:443?transport=tcp,credential:webrtc'}   
+  {'url':'turn:webrtc@turn.anyfirewall.com:443?transport=tcp,credential:webrtc'},
+
+var STUN = {
+    url: isChrome 
+       ? 'stun:stun.l.google.com:19302' 
+       : 'stun:23.21.150.121'
+};
+
+var TURN = {
+    url: 'turn:homeo@turn.bistri.com:80',
+    credential: 'homeo'
+};
+
+var iceServers = {
+   iceServers: [STUN, TURN]
+};
+
+
 */ 
 
     
@@ -95,59 +130,64 @@ var sdpConstraints = {'mandatory': {
 
 /////////////////////////////////////////////
 
-//var socket = io.connect("127.0.0.1:2013");
+//var socket = io.connect("https://127.0.0.1:2013",{secure: true});
+//var socket = io.connect("http://127.0.0.1:2013");
 
-var socket = io.connect("webrtcchat-redhatappv2.rhcloud.com:8000");
+//var socket = io.connect("https://webrtcchat-redhatappv2.rhcloud.com:8443 ",{secure: true});
+var socket = io.connect("https://webrtcchat-redhatappv2.rhcloud.com:8443");
 var room;
 
-  socket.emit("search","");
 
-//while(room==null){
+//setTimeout(function(){ socket.emit("search","");},100);
+/* 
+window.onload=function(){
+  //socket.emit("search","");
+setTimeout(function(){ socket.emit("search","");},1000);
+}
+*/
+$(document).ready(function(){
+    //setTimeout(function(){ socket.emit("search","");},1000);
+    socket.emit("search","");
+});
 
-//}
-b.onclick=sendM;
+
+
+//b.onclick=sendM;
+
 socket.on("found", function (data){
   room=data;
   console.log("Room is " + data);
   
   if (data !== '') {
     
-    console.log("Room received as " + room);
-  
-  console.log('Create or join room', data);
-  socket.emit('create or join', data);
+
+socket.emit('create or join', data);
+
+
+}
+else{
+
+  alert("No room found.Refresh page?..")
 }
 
 });
+
 
 socket.on('created', function (room){
   console.log('Created room ' + room);
   isInitiator = true;
 });
 
-socket.on('mesreceived', function (data){
-  console.log("Message Received..");
-  var d = new Date();
-    var n = d.getHours(); 
-    var m=d.getMinutes();
-if(n<12){
-n='0'+n;
-}
-if(m<10){
-  m='0'+m;
-}
-
-  me.innerHTML+="<p style=color:red>"+n+":"+m+"   "+data+"</p>";
-});
-
 
 socket.on('full', function (room){
   console.log('Room ' + room + ' is full');
+  socket.emit("search","");
+
 });
 
 socket.on('join', function (room){
   console.log('Another peer made a request to join room ' + room);
-  console.log('This peer is the initiator of room ' + room + '!');
+  //console.log('This peer is the initiator of room ' + room + '!');
   isChannelReady = true;
 });
 
@@ -165,29 +205,25 @@ socket.on("change", function (data){
   console.log("Old value of isInitiator : " + isInitiator );
   isInitiator=data;
   console.log("New value of isInitiator : " + isInitiator );
+  var pc;
 });
 
 ////////////////////////////////////////////////
-
-function sendM(){
-  console.log("Send Message..with room : " +room+ " with value " +room );
-  socket.emit("sendM",m.value,room);
-  m.value="";
-  pos(m,0);
-  
-  
-}
 
 function sendMessage(message){
 	console.log('Sending message: ' + message);
   socket.emit('message', message,room);
 }
 
+
 socket.on('message', function (message){
-  console.log('Received message:', message);
-  if (message === 'got user media') {
+  //setTimeout(function(){console.log('Received message:' + message.toString());},100);
+  console.log('Received message:' + message.toString());
+  if (message === 'usermedia') {
   	maybeStart();
-  } else if (message.type === 'offer') {
+  } 
+
+  else if (message.type === 'offer') {
     if (!isInitiator && !isStarted) {
       maybeStart();
     }
@@ -209,11 +245,12 @@ socket.on('message', function (message){
 var localVideo = document.querySelector('#localVideo');
 var remoteVideo = document.querySelector('#remoteVideo');
 
+//burada bi bokluk var..
 function handleUserMedia(stream) {
   localStream = stream;
   attachMediaStream(localVideo, stream);
   console.log('Adding local stream.');
-  sendMessage('got user media');
+  sendMessage('usermedia');
   if (isInitiator) {
     maybeStart();
   }
@@ -223,7 +260,7 @@ function handleUserMediaError(error){
   console.log('getUserMedia error: ', error);
 }
 
-var constraints = {video: true};
+var constraints = {video: true,audio:true};
 
 getUserMedia(constraints, handleUserMedia, handleUserMediaError);
 console.log('Getting user media with constraints', constraints);
@@ -231,6 +268,7 @@ console.log('Getting user media with constraints', constraints);
 if (location.hostname != "localhost") {
   requestTurn("https://computeengineondemand.appspot.com/turn?username=41784574&key=4080218913");
 }
+
 
 function maybeStart() {
   if (!isStarted && localStream && isChannelReady) {
@@ -252,8 +290,9 @@ function signal(){
 
 window.onbeforeunload = function(e){
   signal();
-	sendMessage('bye');
   socket.emit("leaved",room);
+	sendMessage('bye');
+  
 }
 
 /////////////////////////////////////////////////////////
@@ -272,7 +311,7 @@ function createPeerConnection() {
   }
   pc.onaddstream = handleRemoteStreamAdded;
   pc.onremovestream = handleRemoteStreamRemoved;
-
+/*
   if (isInitiator) {
     try {
       // Reliable Data Channels not yet supported in Chrome
@@ -290,33 +329,8 @@ function createPeerConnection() {
   } else {
     pc.ondatachannel = gotReceiveChannel;
   }
+  */
 }
-
-function sendData() {
-  var data = sendTextarea.value;
-  sendChannel.send(data);
-  trace('Sent data: ' + data);
-}
-
-// function closeDataChannels() {
-//   trace('Closing data channels');
-//   sendChannel.close();
-//   trace('Closed data channel with label: ' + sendChannel.label);
-//   receiveChannel.close();
-//   trace('Closed data channel with label: ' + receiveChannel.label);
-//   localPeerConnection.close();
-//   remotePeerConnection.close();
-//   localPeerConnection = null;
-//   remotePeerConnection = null;
-//   trace('Closed peer connections');
-//   startButton.disabled = false;
-//   sendButton.disabled = true;
-//   closeButton.disabled = true;
-//   dataChannelSend.value = "";
-//   dataChannelReceive.value = "";
-//   dataChannelSend.disabled = true;
-//   dataChannelSend.placeholder = "Press Start, enter some text, then press Send.";
-// }
 
 function gotReceiveChannel(event) {
   trace('Receive Channel Callback');
@@ -343,17 +357,6 @@ function handleReceiveChannelStateChange() {
   enableMessageInterface(readyState == "open");
 }
 
-function enableMessageInterface(shouldEnable) {
-    if (shouldEnable) {
-    dataChannelSend.disabled = false;
-    dataChannelSend.focus();
-    dataChannelSend.placeholder = "";
-    sendButton.disabled = false;
-  } else {
-    dataChannelSend.disabled = true;
-    sendButton.disabled = true;
-  }
-}
 
 function handleIceCandidate(event) {
   console.log('handleIceCandidate event: ', event);
@@ -386,7 +389,7 @@ function doCall() {
 
 function doAnswer() {
   console.log('Sending answer to peer.');
-  pc.createAnswer(setLocalAndSendMessage, null, sdpConstraints);
+  pc.createAnswer(setLocalAndSendMessage, handleCreateAnswerError, sdpConstraints);
 }
 
 function mergeConstraints(cons1, cons2) {
@@ -396,6 +399,11 @@ function mergeConstraints(cons1, cons2) {
   }
   merged.optional.concat(cons2.optional);
   return merged;
+}
+
+
+function handleCreateAnswerError(error) {
+  console.log('createAnswer() error: ', error);
 }
 
 function setLocalAndSendMessage(sessionDescription) {
@@ -486,7 +494,7 @@ function stop() {
   pc = null;
 }
 
-///////////////////////////////////////////
+/////////////dont care after here...//////////////////////////////
 
 // Set Opus as the default audio codec if it's present.
 function preferOpus(sdp) {

@@ -28,30 +28,55 @@
     overflow-y: scroll;
     word-wrap: break-word;    
 }
+#local{
+    float: left;
+    border: 2px #fff solid;
+    
+}
+#remote{
+  
+}
+
+body{
+    width: 2000px;
+}
+
 
 
 </style>
+
+
 
 </head>
 
 <body>
 
 <div id='container'>
+ <div id='videos'>
 
-  <div id='videos'>
+    <div id="local">
     <video id='localVideo' autoplay muted></video>
+    </div>
+
+    <div id="remote">
     <video id='remoteVideo' autoplay></video>
-  </div>
+    </div>
+
+ </div>
 </div>
+<!--
 <form name="myForm">
 <textarea id="message"></textarea>
 </form>
 <button id="button" value="send" onkeypress="call(event);" >Send</button>
 
 <div id="messages"></div>
-
+-->
+<!--<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>-->
+<script src='js/jquery.min.js'></script>
 <script src='/socket.io/socket.io.js'></script>
-<script src='js/lib/adapter.js'></script>
+<script src='js/lib/adapter2.js'></script>
+<!--<script src='js/lib/adapter.js'></script>-->
 <script src='js/main.js'></script>
 
 </body>

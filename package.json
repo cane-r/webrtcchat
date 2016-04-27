@@ -1,22 +1,22 @@
 {
   "name": "OpenShift-Sample-App",
   "version": "1.0.0",
-  "description": "Webrtc chat roulette try",
+  "description": "Webrtc Random Chat",
   "keywords": [
     "OpenShift",
     "Node.js",
-    "webrtc",
-    "socket.io"
+    "Webrtc",
+    "Socket.io"
   ],
   "author": {
-    "name": "HorsWithNoname",
+    "name": "HorseWithNoName",
     "email": "-",
     "url": "-"
   },
   "homepage": "-",
   "repository": {
     "type": "git",
-    "url": "https://github.com/cane-r/webrtcchat"
+    "url": "-"
   },
 
   "engines": {
